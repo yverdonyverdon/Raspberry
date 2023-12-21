@@ -1,0 +1,46 @@
+from machine import Pin
+import time
+
+servo_pin = Pin(21, Pin.OUT)
+
+
+def pulse(pin, high_time, low_time):
+    """
+    Geef een puls op de pin:
+    Maak de pin pin_nr hoog, wacht high_time,
+    maak de pin laag, en wacht nog low_time
+    """
+    pin.on()
+    time.sleep(high_time)
+    pin.off()
+    time.sleep(low_time)
+
+
+def servo_pulse(position):
+    """
+    Stuur een servo-puls naar de opgegeven GPIO-pin
+    waardoor de servo naar de opgegeven positie draait, en
+    wacht dan 20 ms.
+
+    De positie moet liggen in het bereik 0 .. 100.
+    Voor dit bereik moet de puls liggen in het bereik 0,5 ms .. 2,5 ms
+
+    Voordat deze functie wordt aangeroepen,
+    moet de GPIO-pin zijn geconfigureerd als uitgang.
+    """
+    if position < 0:
+        position = 0
+    elif position > 100:
+        position = 100
+
+    # Convert position to pulse duration in the range 0.5 ms to 2.5 ms
+    pulse_duration = 0.002 * (position / 100) + 0.0005
+
+    # Use the pulse function to generate the servo pulse
+    pulse(servo_pin, pulse_duration, 0.02)  # Assuming 20 ms period for servo pulses
+
+while True:
+    for i in range(0, 100, 1):
+        servo_pulse(i)
+    for i in range(100, 0, -1):
+        servo_pulse(i)
